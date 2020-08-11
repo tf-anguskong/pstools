@@ -3,7 +3,7 @@
    New-ADUser with a twist
 .DESCRIPTION
     PREREQUISITES:
-        Active Directory Powershell Module Installed (Include when you install RSAT Tools)
+        Active Directory Powershell Module Installed (Included when you install RSAT Tools)
         Appropriate permissions set on Exchange Server (If you want to provision mailbox)
 
     DEFAULT BEHAVIOR:
@@ -23,7 +23,7 @@ function New-ADAccount {
         [Parameter(Mandatory)]$LastName,
         [Parameter(Mandatory)]$RequestID, # Used to append to the ticket in Service Desk
         [Parameter(Mandatory)]$Location, # LA,PTL,SEA, etc etc
-        $EmployeeNumber
+        $EmployeeNumber #Truly unique to allow syncing between another system
     )
     function Update-Request {
         param (
@@ -51,18 +51,17 @@ function New-ADAccount {
         $groups = @()
         # Determines which groups should be used. 
         
-        $SEA = @("Seattle","SEA")
-        $AK = @("Anchorage","Alaska","ANC")
-        $SLC = @("Salt Lake City","SLC","Muir")
-        $LA = @("California","LA","Irwindale","Los Angeles")
-        $PTL = @("Portland","Clackamas","PTL")
-        $SPO = @("Spokane","SPO")
-        $BOI = @("Boise","BOI")
-        $CPFresh = @("CPFresh","Southpark","SP")
+        $SEA = @("SEA")
+        $AK = @("ANC")
+        $SLC = @("SLC")
+        $LA = @("LA")
+        $PTL = @("PTL")
+        $SPO = @("SPO")
+        $BOI = @("BOI")
 
         if ($SEA -contains $Location) {
             $groups += "CN=Everyone - Seattle,OU=Recipients,DC=fleming,DC=systems"
-            $groups += "CN=Charlies,OU=SeattleUsers,OU=Seattle,DC=fleming,DC=systems"
+            $groups += "CN=Group,OU=SeattleUsers,OU=Seattle,DC=fleming,DC=systems"
         }
         if ($BOI -contains $Location) {
             $groups += "CN=BoiseUsers,OU=BoiseGroups,OU=Boise,DC=fleming,DC=systems"
@@ -87,11 +86,6 @@ function New-ADAccount {
         if ($SPO -contains $Location) {
             $groups += "CN=Spokane Users,OU=SpokaneGroups,OU=Spokane,DC=fleming,DC=systems"
             $groups += "CN=Everyone - Spokane,OU=Recipients,DC=fleming,DC=systems"
-        }
-        if ($CPFresh -contains $Location) {
-            $groups += "CN=CPF Main,OU=Recipients,DC=fleming,DC=systems"
-            $groups += "CN=CPFresh,OU=CPFreshGroups,OU=CP Fresh,DC=fleming,DC=systems"
-            $groups += "CN=Everyone - CPFresh,OU=Recipients,DC=fleming,DC=systems"
         }
 
         $groups += "CN=Umbrella Medium Restriction Internet,CN=Users,DC=fleming,DC=systems"
@@ -141,13 +135,13 @@ function New-ADAccount {
             ANC = "OU=AnchorageUsers,OU=Anchorage,DC=fleming,DC=systems"
             BOI = "OU=BoiseUsers,OU=Boise,DC=fleming,DC=systems"
             SLC = "OU=SaltLakeCityUsers,OU=SaltLakeCity,DC=fleming,DC=systems"
-            TEST = "OU=Test Tyler,OU=IT,DC=fleming,DC=systems"
         }
 
         $OU = $ht.$location
         return $OU
 
     }
+
     #Create Username, tries <first name + last initial> first, if that doesn't work <first initial + last name>, if THAT doesn't work <first initial + middle intial + last name>
     if (!$MiddleName){$username = Check-Username -FirstName $FirstName -LastName $LastName}
     if ($MiddleName) {$username = Check-Username -FirstName $FirstName -MiddleName $MiddleName -LastName $LastName}
