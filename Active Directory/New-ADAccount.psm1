@@ -39,7 +39,7 @@ function New-ADAccount {
             "<p>"+$g+"</p>"
         }
 
-        Send-MailMessage -Subject "[Request ID :##$RequestID##] : New User Made -- TESTING " -SmtpServer webmail.triplebcorp.com -To "techsupport@charliesproduce.com" -BodyAsHtml $body -From "ADPowershell@triplebcorp.com"
+        Send-MailMessage -Subject "[Request ID :##$RequestID##] : New User Made -- TESTING " -SmtpServer "smtp server" -To "support email" -BodyAsHtml $body -From "from address"
 
     }
     #Determines the base groups based off location specified. 
